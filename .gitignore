@@ -1,0 +1,29 @@
+# Node modules
+node_modules/
+
+# Auth session data (contains sensitive info)
+auth_info/session*/
+auth_info/.wwebjs_auth/
+auth_info/.wwebjs_cache/
+
+# Keep the auth_info folder but ignore contents
+!auth_info/.gitkeep
+
+# Config with real numbers (create from template)
+# config.json
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Environment variables
+.env
+.env.local

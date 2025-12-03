@@ -1,0 +1,3 @@
+# This folder is used by LocalAuth to store session data
+# Do not delete this folder if you want to persist your WhatsApp session
+# If you need to re-authenticate, delete the contents of this folder

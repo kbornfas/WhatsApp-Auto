@@ -1,0 +1,18 @@
+{
+  "groupName": "My Awesome Group",
+  "numbers": [
+    "1234567890",
+    "0987654321",
+    "5551234567"
+  ],
+  "messageTemplates": {
+    "welcomeMessage": "Welcome to the group! 🎉",
+    "inviteFallback": "Hey! I tried adding you to {groupName} but your privacy settings blocked it. Please join here: {inviteLink}",
+    "bulkMessage": "Hello! This is an automated message."
+  },
+  "settings": {
+    "minDelaySeconds": 5,
+    "maxDelaySeconds": 15,
+    "countryCode": "1"
+  }
+}

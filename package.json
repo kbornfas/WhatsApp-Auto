@@ -1,0 +1,21 @@
+{
+  "name": "whatsapp-auto",
+  "version": "1.0.0",
+  "description": "CLI tool for WhatsApp automation - bulk messaging and group management",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "keywords": [
+    "whatsapp",
+    "automation",
+    "cli",
+    "bulk-messaging"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "qrcode-terminal": "^0.12.0",
+    "whatsapp-web.js": "^1.34.2"
+  }
+}
