@@ -1294,22 +1294,151 @@ async function exitApp() {
     process.exit(0);
 }
 
+/**
+ * Check if existing session exists
+ */
+function hasExistingSession() {
+    const sessionPath = path.join('./auth_info', 'session');
+    const wwebjsPath = path.join('./auth_info', '.wwebjs_auth');
+    return fs.existsSync(sessionPath) || fs.existsSync(wwebjsPath) || fs.existsSync('./auth_info/Default');
+}
+
+/**
+ * Delete existing session to force new login
+ */
+function deleteSession() {
+    const authPath = './auth_info';
+    if (fs.existsSync(authPath)) {
+        try {
+            fs.rmSync(authPath, { recursive: true, force: true });
+            return true;
+        } catch (error) {
+            return false;
+        }
+    }
+    return true;
+}
+
+/**
+ * Show startup menu to choose account
+ */
+async function showStartupMenu() {
+    // Create readline for startup menu
+    const startupRl = readline.createInterface({
+        input: process.stdin,
+        output: process.stdout
+    });
+    
+    const startupPrompt = (question) => {
+        return new Promise((resolve) => {
+            startupRl.question(question, (answer) => {
+                resolve(answer.trim());
+            });
+        });
+    };
+    
+    console.clear();
+    console.log('');
+    console.log('╔══════════════════════════════════════════════════════════╗');
+    console.log('║         📱 WhatsApp Automation CLI Tool                  ║');
+    console.log('║         ⚠️  Use at your own risk - Ban possible!         ║');
+    console.log('╚══════════════════════════════════════════════════════════╝');
+    console.log('');
+    
+    const sessionExists = hasExistingSession();
+    
+    if (sessionExists) {
+        console.log('┌─────────────────────────────────────────────────────────┐');
+        console.log('│              🔐 ACCOUNT SELECTION                       │');
+        console.log('├─────────────────────────────────────────────────────────┤');
+        console.log('│  An existing WhatsApp session was found.                │');
+        console.log('│                                                         │');
+        console.log('│  1. ✅ Use existing account (quick login)               │');
+        console.log('│  2. 🔄 Login with a different account (new QR)          │');
+        console.log('│  3. 🚪 Exit                                             │');
+        console.log('└─────────────────────────────────────────────────────────┘');
+        console.log('');
+        
+        const choice = await startupPrompt('Select an option (1-3): ');
+        
+        startupRl.close();
+        
+        switch (choice) {
+            case '1':
+                // Use existing session
+                console.log('');
+                log('Using existing session...', 'info');
+                return true;
+                
+            case '2':
+                // Delete session and login fresh
+                console.log('');
+                log('Clearing existing session...', 'info');
+                if (deleteSession()) {
+                    log('Session cleared. You will need to scan a new QR code.', 'success');
+                } else {
+                    log('Could not clear session. Please manually delete the auth_info folder.', 'error');
+                }
+                return true;
+                
+            case '3':
+                console.log('');
+                log('Goodbye! 👋', 'success');
+                process.exit(0);
+                
+            default:
+                log('Invalid option. Using existing account...', 'warning');
+                return true;
+        }
+    } else {
+        console.log('┌─────────────────────────────────────────────────────────┐');
+        console.log('│              🔐 FIRST TIME SETUP                        │');
+        console.log('├─────────────────────────────────────────────────────────┤');
+        console.log('│  No existing session found.                             │');
+        console.log('│  You will need to scan a QR code to login.              │');
+        console.log('│                                                         │');
+        console.log('│  1. 📱 Continue to login                                │');
+        console.log('│  2. 🚪 Exit                                             │');
+        console.log('└─────────────────────────────────────────────────────────┘');
+        console.log('');
+        
+        const choice = await startupPrompt('Select an option (1-2): ');
+        
+        startupRl.close();
+        
+        switch (choice) {
+            case '1':
+                console.log('');
+                log('Starting login process...', 'info');
+                return true;
+                
+            case '2':
+                console.log('');
+                log('Goodbye! 👋', 'success');
+                process.exit(0);
+                
+            default:
+                log('Continuing to login...', 'info');
+                return true;
+        }
+    }
+}
+
 // ============================================
 // START THE CLIENT
 // ============================================
 
-console.clear();
-console.log('');
-console.log('╔══════════════════════════════════════════════════════════╗');
-console.log('║         📱 WhatsApp Automation CLI Tool                  ║');
-console.log('║         ⚠️  Use at your own risk - Ban possible!         ║');
-console.log('╚══════════════════════════════════════════════════════════╝');
-console.log('');
-log('Initializing WhatsApp client...', 'info');
-log('This may take a moment on first run...', 'info');
-console.log('');
-
-client.initialize();
+// Main entry point - show startup menu first
+(async () => {
+    await showStartupMenu();
+    
+    console.log('');
+    log('Initializing WhatsApp client...', 'info');
+    log('This may take a moment on first run...', 'info');
+    console.log('');
+    
+    client.initialize();
+})();
 
 // ============================================
 // GRACEFUL SHUTDOWN HANDLERS
